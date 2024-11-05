@@ -1,5 +1,7 @@
+import time
 import os
 
+import redis
 import sqlite3
 # from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
@@ -9,6 +11,19 @@ app = Flask(__name__)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+cache = redis.Redis(host='redis', port=6379)
+
+def get_hit_count():
+    retries = 5
+    while True:
+        try:
+            return cache.incr('hits')
+        except redis.exceptions.ConnectionError as exc:
+            if retries == 0:
+                raise exc
+            retries -= 1
+            time.sleep(0.5)
+
 
 # # Configure CS50 Library to use SQLite database
 # con = sqlite3.connect("birthdays.db")
@@ -56,3 +71,8 @@ def test():
     return {"message": "Hello World"}
     # if request.method == "GET":
     #     return datats
+
+@app.route('/count')
+def hello():
+    count = get_hit_count()
+    return 'Hello world! I have been seen {} times.\n'.format(count)
