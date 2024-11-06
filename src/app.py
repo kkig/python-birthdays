@@ -2,7 +2,8 @@ import time
 import os
 
 import redis
-import sqlite3
+# from redis.cache import CacheConfig
+# import sqlite3
 # from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 
@@ -11,18 +12,25 @@ app = Flask(__name__)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-cache = redis.Redis(host='redis', port=6379)
 
-def get_hit_count():
-    retries = 5
-    while True:
-        try:
-            return cache.incr('hits')
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
+
+cache = redis.Redis(
+    host="localhost", 
+    port=6379, 
+    # cache_config=CacheConfig(), 
+    decode_responses=True
+    )
+
+# def get_hit_count():
+#     retries = 5
+#     while True:
+#         try:
+#             return cache.incr('hits')
+#         except redis.exceptions.ConnectionError as exc:
+#             if retries == 0:
+#                 raise exc
+#             retries -= 1
+#             time.sleep(0.5)
 
 
 # # Configure CS50 Library to use SQLite database
@@ -57,22 +65,27 @@ def index():
     if request.method == "POST":
 
         # TODO: Add the user's entry into the database
-
-        return redirect("/")
+        name = request.form.get("name")
+        bday = request.form.get("bday")
+        if name and bday:
+            return render_template("index.html", name=name, bday=bday)
+        
+        # Invalid input
+        return render_template("index.html", error="Invalid input")
 
     else:
 
         # TODO: Display the entries in the database on index.html
 
-        return render_template("index.html", name="Ami")
+        return render_template("index.html", name=request.form.get("name"))
 
-@app.route("/test", methods=["GET"])
-def test():
-    return {"message": "Hello World"}
+# @app.route("/test", methods=["GET"])
+# def test():
+#     return {"message": "Hello World"}
     # if request.method == "GET":
     #     return datats
 
-@app.route('/count')
-def hello():
-    count = get_hit_count()
-    return 'Hello world! I have been seen {} times.\n'.format(count)
+# @app.route('/count')
+# def hello():
+#     count = get_hit_count()
+#     return 'Hello world! I have been seen {} times.\n'.format(count)
