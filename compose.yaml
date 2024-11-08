@@ -7,18 +7,69 @@
 # You can add other services your application may depend on here, such as a
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
-include:
-  - infra.yaml
+# include:
+#   - infra.yaml
 services:
+  db:
+    # Using a mariadb image which supports both amd64 & arm64 architecture
+    image: mariadb:10-focal
+    #image: mysql:8
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-password)" --silent',
+        ]
+      interval: 3s
+      retries: 5
+      start_period: 30s
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - backnet
+    environment:
+      - MYSQL_DATABASE=example
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 3306
+      - 33060
+
   web:
-    build: .
+    build:
+      context: web
+      target: builder
+    restart: always
+    secrets:
+      - db-password
     ports:
-      - '8000:5000'
-    develop:
-      watch:
-        - action: sync
-          path: ./src
-          target: /app
+      - 8000:8000
+    networks:
+      - backnet
+      - frontnet
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: ./web
+    #       target: /app
+
+volumes:
+  db-data:
+
+secrets:
+  db-password:
+    file: db/password.txt
+
+networks:
+  backnet:
+  frontnet:
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
 # start the database before your application. The `db-data` volume persists the

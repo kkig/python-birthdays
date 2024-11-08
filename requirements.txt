@@ -1,4 +1,0 @@
-pytest==8.2.2
-flask==3.0.3
-redis
-uvicorn
