@@ -50,7 +50,7 @@
 
       <div class="section">
         <h2>All Birthdays</h2>
-        {% if name and bday %}
+        {% if data %}
         <table>
           <thead>
             <tr>
@@ -59,10 +59,12 @@
             </tr>
           </thead>
           <tbody>
+            {% for _, name, bday in data %}
             <tr>
               <td>{{ name }}</td>
               <td>{{ bday }}</td>
             </tr>
+            {% endfor %}
 
             <!-- TODO: Loop through the database entries to display them in this table -->
           </tbody>

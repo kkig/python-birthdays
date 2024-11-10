@@ -13,6 +13,18 @@ app = Flask(__name__)
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+conn = None
+
+
+# @app.before_request
+# def before_request(request):
+#     """Ensure DB is connected"""
+#     global conn
+
+#     if not conn:
+#         conn = DB()
+#         conn.populate()
+
 
 @app.after_request
 def after_request(response):
@@ -38,25 +50,35 @@ def index():
 
     else:
         # TODO: Display the entries in the database on index.html
+        global conn
 
-        return render_template("index.html", name=request.form.get("name"))
+        if not conn:
+            conn = DB()
+            conn.populate()
+        # names = []
+        # bdays = []
 
+        rec = conn.query_all()
+        # for person in rec:
+        #     _, name, date = person
+        #     names.append(name)
+        #     bdays.append(date)
 
-conn = None
+        return render_template("index.html", data=rec)
 
 
 @app.route("/names")
 def listNames():
     global conn
-    # conn = None
+
     if not conn:
         conn = DB()
         conn.populate()
-    rec = conn.query_names()
+    rec = conn.query_all()
 
     respose = ""
     for c in rec:
-        respose = respose + "<div> Hello " + c + "</div>"
+        respose = respose + "<div> Hello " + c[1] + " born in " + str(c[2]) + "</div>"
     return respose
 
 

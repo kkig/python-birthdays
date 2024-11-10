@@ -1,6 +1,7 @@
 import os
 import mysql.connector
 from mysql.connector import errorcode
+from datetime import date
 
 
 # SMQ connector doc:
@@ -13,7 +14,7 @@ class Config:
         _config = {
             "user": "root",
             "host": "db",
-            "database": "example",
+            "database": "bdays",
         }
 
         try:
@@ -27,8 +28,10 @@ class Config:
 
 class DB:
     def __init__(self):
-        self.conn = self._start(Config.init())
+        self.config = Config.init()
+        self.conn = self._start(self.config)
         self.cursor = self.conn.cursor()
+        self._TABALE_NAME = "persons"
 
     def _start(self, config):
         try:
@@ -43,25 +46,36 @@ class DB:
             exit(1)
 
     def populate(self):
-        tableName = "persons"
+        # tableName = "persons"
 
-        # self.cursor.execute("DROP TABLE IF EXISTS persons")
-        # self.cursor.execute("CREATE TABLE persons (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), birthday DATE)")
+        self.cursor.execute("DROP TABLE IF EXISTS persons")
+        self.cursor.execute(
+            "CREATE TABLE persons (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, date DATE)"
+        )
         try:
-            self.cursor.execute(
-                f"CREATE TABLE {tableName} (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255))"
-            )
+            # self.cursor.execute(
+            #     f"CREATE TABLE {tableName} (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), date DATE)"
+            # )
+            # self.cursor.executemany(
+            #     f"INSERT INTO {tableName} (id, name, date) VALUES (%s, %s, %s);",
+            #     [(i, "User #%d" % i, "2009-02-19") for i in range(5)],
+            # )
+            # self.cursor.executemany('INSERT INTO blog (id, title) VALUES (%s, %s);', [(i, 'Blog post #%d'% i) for i in range (1,5)])
             self.cursor.executemany(
-                f"INSERT INTO {tableName} (id, name) VALUES (%s, %s);",
-                [(i, "User #%d" % i) for i in range(5)],
+                "INSERT INTO persons (name, date) VALUES (%s, %s);",
+                [
+                    ("Jane", date(2005, 2, 12)),
+                    ("Joe", date(2006, 5, 23)),
+                    ("John", date(2010, 10, 3)),
+                ],
             )
             self.connection.commit()
         except:
             print("Error creating table persons.")
 
-    def query_names(self):
-        self.cursor.execute("SELECT name FROM persons")
+    def query_all(self):
+        self.cursor.execute(f"SELECT * FROM {self._TABALE_NAME}")
         rec = []
         for c in self.cursor:
-            rec.append(c[0])
+            rec.append(c)
         return rec
