@@ -1,29 +1,10 @@
-import time
-import os
 from datetime import date
 from dbloader import DB
+from . import app
 
-# import sqlite3
-# from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 
-# Configure application
-app = Flask(__name__)
-
-# Ensure templates are auto-reloaded
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-
 conn = None
-
-
-# @app.before_request
-# def before_request(request):
-#     """Ensure DB is connected"""
-#     global conn
-
-#     if not conn:
-#         conn = DB()
-#         conn.populate()
 
 
 @app.after_request
@@ -80,7 +61,3 @@ def listNames():
     for c in rec:
         respose = respose + "<div> Hello " + c[1] + " born in " + str(c[2]) + "</div>"
     return respose
-
-
-if __name__ == "__main__":
-    app.run()
