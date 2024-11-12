@@ -2,7 +2,9 @@ from datetime import date
 from dbloader import DB
 from . import app
 
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+
+# from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import render_template, request
 
 conn = None
 
