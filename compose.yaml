@@ -57,8 +57,8 @@ services:
     develop:
       watch:
         - action: rebuild
-          path: /web
-          target: /code
+          path: .
+          # path: /web
 
 volumes:
   db-data:

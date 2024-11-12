@@ -1,14 +1,14 @@
 from datetime import date
 
 
-def isNameValid(name):
+def isNameValid(name: str) -> bool:
     return name.isalnum()
 
 
-def toDate(dEntry):
+def getDate(bday: str):
     try:
-        return date.fromisoformat(dEntry)
-    except TypeError:
+        return date.fromisoformat(bday)
+    except ValueError:
         print("Invalid input type for date.")
     except:
         print("Invalid input for date.")

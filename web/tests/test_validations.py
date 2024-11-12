@@ -1,15 +1,15 @@
 from datetime import date
-from helpers import toDate
+from helpers import getDate
 # import pytest
 
 
 def test_bad_string():
-    assert toDate("Jim") is None
+    assert getDate("Jim") is None
 
 
 def test_bad_type():
-    assert toDate(999 - 10 - 20) is None
+    assert getDate(999 - 10 - 20) is None
 
 
 def test_format():
-    assert toDate("1999-10-19") == date(1999, 10, 19)
+    assert getDate("1999-10-19") == date(1999, 10, 19)

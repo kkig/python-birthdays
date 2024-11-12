@@ -2,11 +2,13 @@
 **/__pycache__
 **/.venv
 **/.classpath
+**/.conda
 **/.dockerignore
 **/.env
 **/.git
 **/.gitignore
 **/.project
+**/.pytest_cache
 **/.settings
 **/.toolstarget
 **/.vs
@@ -15,3 +17,4 @@
 **/*.dbmdl
 **/*.jfm
 **/bin
+**/.pytest_cache
