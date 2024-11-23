@@ -18,3 +18,5 @@
 **/*.jfm
 **/bin
 **/.pytest_cache
+
+**/instance
